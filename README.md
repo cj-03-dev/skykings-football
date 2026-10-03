@@ -38,10 +38,16 @@ and reach further in goal.
   motion blur, crashes into centre stage with a flash and shockwave, and the
   title slams down while the game loads. Tap to skip. (A 2D ball stands in on
   devices without WebGL.)
-- **3D broadcast camera:** a perspective camera behind the near touchline pans
-  with the play, so players are big and the far side recedes; goals, boards,
-  stands and the crowd are all placed in 3D. On wide phones the view widens to
-  fill the screen.
+- **Real 3D gameplay (WebGL, three.js):** every kid is a 3D model built from
+  their data (height, skin tone, build, hair, Shaurya's crown, Ibrahim's
+  sunglasses, shirt number on the back) and animated from the match: running,
+  kicks, slide tackles, keeper dives, throw-ins and celebrations. Real-time
+  shadows, a 3D ball that rolls with its true spin, goals with nets, tiered
+  stands with a bouncing crowd, ad boards and floodlight pylons. A broadcast
+  camera behind the near touchline follows the ball, dollies with the play
+  and swings round to frame the net for goals. On wide phones the view widens
+  to fill the screen.
+- **No WebGL?** The game falls back to a 2.5D canvas view automatically.
 - **Atmosphere:** a crowd that bobs and goes wild for goals, camera flashes,
   corner flags, kick dust, ball trails on shots, and confetti for every goal.
   An arrow at the screen edge shows where you are if you're out of shot.
@@ -100,7 +106,8 @@ can sail over the bar.
 | `js/data.js`    | The squad, clubs, positions and difficulty numbers.              |
 | `js/art.js`     | Drawing the kids, the ball and the club crests.                  |
 | `js/match.js`   | Ball physics, rules, ball boy, and the AI.                       |
-| `js/render.js`  | The 3D camera, stadium, pitch, players, effects and HUD.         |
+| `js/render3d.js`| The 3D match: stadium, 3D kids and their animation, camera.      |
+| `js/render.js`  | Name tags, effects and HUD over the 3D view; the 2.5D fallback.  |
 | `js/intro.js`   | The WebGL spinning-ball load screen.                             |
 | `js/input.js`   | Keyboard and touch input.                                        |
 | `js/audio.js`   | FAAH playback and the synthesised match sounds.                  |
@@ -108,6 +115,7 @@ can sail over the bar.
 | `js/main.js`    | The game loop.                                                   |
 | `assets/faah.mp3` | The FAAH clip for missed shots.                                |
 | `assets/fonts`  | Russo One and Barlow Condensed (SIL Open Font License).          |
+| `assets/vendor` | three.js r147 (MIT), bundled so the game works offline.          |
 
 `window.SK` exposes everything for poking at from the console. For example,
 `SK.debug.speed = 8` fast-forwards a match.

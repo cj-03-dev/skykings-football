@@ -34,15 +34,19 @@
   })();
   const CAM_MIN = 350, CAM_MAX = PW - 350;   // pans just far enough to see each goal
   R.cam = cam;
+  R.getK = () => k;
 
-  function proj(x, y, z = 0) {
+  function proj2d(x, y, z = 0) {
     const dx = x - cam.x, dy = y - cam.cy, dz = z - cam.cz;
     const zc = Math.max(40, dy * cam.fy + dz * cam.fz);
     const yc = dy * cam.uy + dz * cam.uz;
     const s = CAM.F / zc;
     return { x: W / 2 + dx * s, y: H / 2 - yc * s + CAM.yoff, s };
   }
-  R.proj = proj;
+  // The 3D renderer swaps in its own camera so labels and effects line up.
+  let proj = proj2d;
+  R.setProjector = (fn) => { proj = fn || proj2d; };
+  R.proj = (x, y, z) => proj(x, y, z);
 
   // Follow the ball, leaning a little toward the human player.
   function updateCamera(m, snap) {
@@ -124,6 +128,7 @@
   // drawImage calls. Strips bob on their own rhythm and jump for goals.
   const STAND = { x0: -700, x1: PW + 700, rows: 14, y0: -92, dy: 17, dz: 14 };
   const strips = [];
+  R.strips = strips;
   const endFans = [];
   function buildCrowd() {
     const rnd = seeded(7);
@@ -388,8 +393,15 @@
     });
     c.restore();
 
-    // Name tag over the head.
-    const top = pr.y - (52 * p.kid.height * SPR + 6 + lift) * s;
+    drawLabel(c, p, lift);
+  }
+
+  function drawLabel(c, p, lift = 0) {
+    const pr = proj(p.x, p.y, 0);
+    const s = pr.s;
+    // Name tag over the head (projected at head height, so it works for
+    // both the 2D and the 3D camera).
+    const top = proj(p.x, p.y, 52 * p.kid.height * SPR + 6 + lift).y;
     c.font = `700 ${Math.round(11 * s)}px ${UI}`;
     c.textAlign = 'center';
     c.textBaseline = 'bottom';
@@ -708,29 +720,52 @@
       ctx.fillRect(0, 0, W, H);
       fx.flash--;
     }
-    if (opts.hud !== false) {
-      scoreboard(ctx, m);
-      youPanel(ctx, m);
-      offscreenArrow(ctx, m);
-      drawToasts(ctx);
-      if (m.phase === 'kickoff' && m.phaseT < m.KO_FREEZE) {
-        banner(ctx, 'KICK OFF', m.kickTeam.def.name, m.phaseT / m.KO_FREEZE, '#ffffff');
-      }
-      if (fx.banner) {
-        const t = (performance.now() - fx.banner.start) / fx.banner.ms;
-        if (t >= 1) fx.banner = null;
-        else banner(ctx, fx.banner.title, fx.banner.sub, t, fx.banner.color);
-      }
-      const h = m.human;
-      const touch = opts.touch;
-      if (h && h.kind === 'ballboy') {
-        if (m.phase === 'out' && h.state === 'fetch') prompt(ctx, 'RUN TO THE BALL!');
-        else if (h.state === 'hold') prompt(ctx, touch ? 'HOLD THROW, AIM, RELEASE' : 'HOLD SPACE TO THROW · AIM WITH ARROWS');
-      } else if (h && m.phase === 'kickoff' && m.ball.owner === h && m.phaseT >= m.KO_FREEZE) {
-        prompt(ctx, touch ? 'MOVE OR PASS TO KICK OFF' : 'MOVE OR PRESS E TO KICK OFF');
-      }
-    }
+    if (opts.hud !== false) drawHud(ctx, m, opts);
   };
+
+  // Overlay mode: the 3D renderer has drawn the world underneath, so this
+  // canvas only adds name tags, power bars, effects and the HUD.
+  R.drawOverlay = function (m, opts = {}) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (fx.hype > 0) fx.hype = Math.max(0, fx.hype - 0.004);
+    if (!m) return;
+    if (m !== lastMatch) { lastMatch = m; fx.parts = []; fx.trail = []; }
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    drawTrail(ctx, m.ball);
+    const ents = [...m.players, m.bb].sort((a, c) => a.y - c.y);
+    if (opts.hud !== false) for (const e of ents) drawLabel(ctx, e, e.pose === 'celebrate' ? 4 : (e.z || 0));
+    stepParts(ctx);
+    if (fx.flash > 0) {
+      ctx.fillStyle = `rgba(255,236,170,${Math.min(0.28, fx.flash / 160)})`;
+      ctx.fillRect(0, 0, W, H);
+      fx.flash--;
+    }
+    if (opts.hud !== false) drawHud(ctx, m, opts);
+  };
+
+  function drawHud(ctx, m, opts) {
+    scoreboard(ctx, m);
+    youPanel(ctx, m);
+    offscreenArrow(ctx, m);
+    drawToasts(ctx);
+    if (m.phase === 'kickoff' && m.phaseT < m.KO_FREEZE) {
+      banner(ctx, 'KICK OFF', m.kickTeam.def.name, m.phaseT / m.KO_FREEZE, '#ffffff');
+    }
+    if (fx.banner) {
+      const t = (performance.now() - fx.banner.start) / fx.banner.ms;
+      if (t >= 1) fx.banner = null;
+      else banner(ctx, fx.banner.title, fx.banner.sub, t, fx.banner.color);
+    }
+    const h = m.human;
+    const touch = opts.touch;
+    if (h && h.kind === 'ballboy') {
+      if (m.phase === 'out' && h.state === 'fetch') prompt(ctx, 'RUN TO THE BALL!');
+      else if (h.state === 'hold') prompt(ctx, touch ? 'HOLD THROW, AIM, RELEASE' : 'HOLD SPACE TO THROW · AIM WITH ARROWS');
+    } else if (h && m.phase === 'kickoff' && m.ball.owner === h && m.phaseT >= m.KO_FREEZE) {
+      prompt(ctx, touch ? 'MOVE OR PASS TO KICK OFF' : 'MOVE OR PRESS E TO KICK OFF');
+    }
+  }
 
   function vignette(c) {
     const v = c.createRadialGradient(W / 2, H * 0.55, H * 0.4, W / 2, H * 0.55, H * 1.0);

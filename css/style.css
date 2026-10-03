@@ -41,7 +41,7 @@ html, body {
 button { font: inherit; color: inherit; cursor: pointer; }
 button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
-#pitch {
+#pitch, #pitch3d {
   position: fixed;
   left: 50%;
   top: 50%;
@@ -49,6 +49,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   display: block;
   touch-action: none;
 }
+#pitch3d { pointer-events: none; }
 
 /* ------------------------------------------------------------- screens */
 

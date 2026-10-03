@@ -11,6 +11,10 @@
   const game = (SK.game = { mode: 'menu', match: null, demo: null, paused: false, cfg: null, touch: SK.ui.isTouch });
 
   SK.render.init($('pitch'));
+  // Real 3D when WebGL is available; the 2.5D canvas renderer otherwise.
+  game.use3d = !!(SK.render3d && SK.render3d.init && SK.render3d.init($('pitch3d')));
+  if (game.use3d) SK.render.setProjector(SK.render3d.project);
+  else $('pitch3d').hidden = true;
 
   // Sound needs a user gesture before it may start: the first tap or key does it.
   game.unlockAudio = () => SK.audio.unlock();
@@ -31,7 +35,7 @@
   window.addEventListener('resize', () => {
     if (resizeQueued) return;
     resizeQueued = true;
-    requestAnimationFrame(() => { resizeQueued = false; SK.render.resize(); checkRotate(); });
+    requestAnimationFrame(() => { resizeQueued = false; SK.render.resize(); if (game.use3d) SK.render3d.resize(); checkRotate(); });
   });
   // Fonts arrive after first paint; redraw the static layer once they do.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => SK.render.resize());
@@ -152,7 +156,10 @@
       if (!inMatch && m.phase === 'fulltime' && m.phaseT > 240) newDemo();
     } else acc = 0;
 
-    SK.render.draw(m, { hud: inMatch, touch: game.touch });
+    if (game.use3d) {
+      SK.render3d.draw(m);
+      SK.render.drawOverlay(m, { hud: inMatch, touch: game.touch });
+    } else SK.render.draw(m, { hud: inMatch, touch: game.touch });
     SK.audio.frame(inMatch ? m : null);
     if (inMatch && m) SK.ui.frame(m);
     requestAnimationFrame(frame);
