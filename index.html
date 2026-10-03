@@ -15,12 +15,15 @@
 
   <!-- ============================================================ title -->
   <section id="screen-title" class="screen active" aria-labelledby="titleHead">
+    <canvas id="intro" aria-hidden="true"></canvas>
     <div class="title-wrap">
       <p class="kicker">4 v 4 · First to 3</p>
       <h1 id="titleHead" class="logo"><span>SkyKings</span><small>Elite Juniors</small></h1>
+      <div class="loader" aria-live="polite"><div class="load-track"><i id="loadBar"></i></div><span id="loadPct">0%</span></div>
       <button class="cta" id="btnPlay" type="button">Play</button>
       <p class="hint keys-only">Keyboard: arrows/WASD move · Space shoot · E pass · Q tackle or save · P pause · M mute</p>
     </div>
+    <p class="skip">Tap to skip</p>
   </section>
 
   <!-- ===================================================== choose player -->
@@ -133,6 +136,7 @@
   <script src="js/input.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/intro.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

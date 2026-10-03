@@ -263,6 +263,13 @@
     }
   };
 
+  // The PLAY button gets a thump and whistle.
+  A.uiKick = function () {
+    if (!ctx || A.muted) return;
+    S.kick(1);
+    setTimeout(() => { if (!A.muted) S.whistle('out'); }, 120);
+  };
+
   // ------------------------------------------------------------ match events
 
   A.onEvent = function (e) {

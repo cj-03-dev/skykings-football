@@ -16,6 +16,7 @@
   UI.show = function (name) {
     document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.id === 'screen-' + name));
     UI.current = name;
+    if (SK.intro) SK.intro.setActive(name === 'title');
     requestAnimationFrame(() => paintScreen(name));
   };
 
@@ -123,7 +124,7 @@
       b.type = 'button';
       b.className = 'card pos' + (sel.role === pos.id ? ' on' : '');
       b.dataset.role = pos.id;
-      b.innerHTML = `<div class="big">${pos.number}</div><div class="name">${pos.name}</div>${miniPitch(pos.id)}<div class="note">${pos.blurb}</div>`;
+      b.innerHTML = `<div class="name">${pos.name}</div>${miniPitch(pos.id)}<div class="note">${pos.blurb}</div>`;
       b.addEventListener('click', () => {
         sel.role = pos.id;
         grid.querySelectorAll('.card').forEach((c) => c.classList.toggle('on', c.dataset.role === pos.id));
@@ -235,7 +236,11 @@
   UI.init = function () {
     buildKids();
 
-    $('btnPlay').addEventListener('click', () => { SK.game.unlockAudio && SK.game.unlockAudio(); UI.show('pick'); });
+    $('btnPlay').addEventListener('click', () => {
+      SK.game.unlockAudio && SK.game.unlockAudio();
+      if (SK.audio) SK.audio.uiKick();
+      UI.show('pick');
+    });
     document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => UI.show(b.dataset.back)));
 
     $('pickNext').addEventListener('click', () => {

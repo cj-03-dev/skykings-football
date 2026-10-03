@@ -159,6 +159,7 @@
   }
 
   SK.ui.init();
+  SK.intro.start();
   requestAnimationFrame(frame);
 
   // For poking at from the console, and for the automated soak tests.
