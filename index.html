@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="SkyKings Elite Juniors: a 4v4 kids' football game. Pick your player, pick your club, first to 3 wins." />
+  <meta name="theme-color" content="#070d22" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SkyKings Elite Juniors</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="pitch" aria-label="SkyKings Elite Juniors match" role="img"></canvas>
+
+  <!-- ============================================================ title -->
+  <section id="screen-title" class="screen active" aria-labelledby="titleHead">
+    <div class="title-wrap">
+      <p class="kicker">4 v 4 · First to 3</p>
+      <h1 id="titleHead" class="logo"><span>SkyKings</span><small>Elite Juniors</small></h1>
+      <button class="cta" id="btnPlay" type="button">Play</button>
+      <p class="hint keys-only">Keyboard: arrows/WASD move · Space shoot · E pass · Q tackle or save · P pause</p>
+    </div>
+  </section>
+
+  <!-- ===================================================== choose player -->
+  <section id="screen-pick" class="screen" aria-labelledby="pickHead">
+    <header class="bar">
+      <button class="back" data-back="title" type="button" aria-label="Back">‹</button>
+      <div><p class="step">Step 1 of 4</p><h2 id="pickHead">Choose your player</h2></div>
+    </header>
+    <div class="cards kids" id="kidGrid"></div>
+    <footer class="foot">
+      <p class="sel-note" id="kidNote">Tap a player</p>
+      <button class="cta small" id="pickNext" type="button" disabled>Continue</button>
+    </footer>
+  </section>
+
+  <!-- ======================================================= choose club -->
+  <section id="screen-team" class="screen" aria-labelledby="teamHead">
+    <header class="bar">
+      <button class="back" data-back="pick" type="button" aria-label="Back">‹</button>
+      <div><p class="step">Step 2 of 4</p><h2 id="teamHead">Choose your club</h2></div>
+    </header>
+    <div class="cards clubs" id="clubGrid"></div>
+    <footer class="foot">
+      <p class="sel-note" id="teamNote">Tap a club</p>
+      <button class="cta small" id="teamNext" type="button" disabled>Continue</button>
+    </footer>
+  </section>
+
+  <!-- =================================================== choose position -->
+  <section id="screen-pos" class="screen" aria-labelledby="posHead">
+    <header class="bar">
+      <button class="back" data-back="team" type="button" aria-label="Back">‹</button>
+      <div><p class="step">Step 3 of 4</p><h2 id="posHead">Choose your position</h2></div>
+    </header>
+    <div class="cards positions" id="posGrid"></div>
+    <footer class="foot">
+      <p class="sel-note" id="posNote">Tap a position</p>
+      <button class="cta small" id="posNext" type="button" disabled>Continue</button>
+    </footer>
+  </section>
+
+  <!-- ======================================================= match setup -->
+  <section id="screen-setup" class="screen" aria-labelledby="setupHead">
+    <header class="bar">
+      <button class="back" id="setupBack" type="button" aria-label="Back">‹</button>
+      <div><p class="step" id="setupStep">Step 4 of 4</p><h2 id="setupHead">Match setup</h2></div>
+    </header>
+    <div class="setup">
+      <div class="seg" role="radiogroup" aria-label="Difficulty" id="diffSeg">
+        <button type="button" role="radio" data-diff="easy">Easy</button>
+        <button type="button" role="radio" data-diff="normal" aria-checked="true" class="on">Normal</button>
+        <button type="button" role="radio" data-diff="hard">Hard</button>
+      </div>
+      <p class="ballboy-note" id="ballboyNote" hidden>You're Ibrahim, the ball boy. When the ball goes out, run round the track, pick it up and throw it back in.</p>
+      <div class="lineups" id="lineups"></div>
+    </div>
+    <footer class="foot">
+      <button class="ghost" id="btnShuffle" type="button">Shuffle the others</button>
+      <button class="cta small" id="btnKickoff" type="button">Kick off!</button>
+    </footer>
+  </section>
+
+  <!-- ============================================================= pause -->
+  <section id="screen-pause" class="screen overlay" aria-labelledby="pauseHead">
+    <div class="panel">
+      <h2 id="pauseHead">Paused</h2>
+      <button class="cta small" id="btnResume" type="button">Resume</button>
+      <button class="ghost" id="btnRestart" type="button">Restart match</button>
+      <button class="ghost" id="btnQuit" type="button">Quit to menu</button>
+      <p class="hint keys-only">Arrows/WASD move · Space shoot (hold for power) · E pass (or call for it) · Q tackle, or save as keeper</p>
+    </div>
+  </section>
+
+  <!-- ========================================================= full time -->
+  <section id="screen-full" class="screen overlay" aria-labelledby="fullHead">
+    <div class="panel wide">
+      <p class="kicker">Full time</p>
+      <h2 id="fullHead">—</h2>
+      <div class="result" id="result"></div>
+      <div class="scorers" id="scorers"></div>
+      <div class="row">
+        <button class="cta small" id="btnRematch" type="button">Rematch</button>
+        <button class="ghost" id="btnNewTeams" type="button">New line-ups</button>
+        <button class="ghost" id="btnMenu" type="button">Main menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== match chrome -->
+  <div id="matchUi" hidden>
+    <button class="icon-btn" id="btnPause" type="button" aria-label="Pause">❚❚</button>
+  </div>
+
+  <div id="touch" hidden>
+    <div id="stickZone"><div id="stickBase"><div id="stickKnob"></div></div></div>
+    <div class="tbtns">
+      <button class="tbtn" id="btnTackle" type="button">Tackle</button>
+      <button class="tbtn" id="btnPass" type="button">Pass</button>
+      <button class="tbtn big" id="btnShoot" type="button">Shoot</button>
+    </div>
+  </div>
+
+  <div id="rotate" hidden><p>Turn your phone sideways for the best view</p><button class="ghost" id="rotateOk" type="button">Play anyway</button></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/match.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
