@@ -19,7 +19,7 @@
       <p class="kicker">4 v 4 · First to 3</p>
       <h1 id="titleHead" class="logo"><span>SkyKings</span><small>Elite Juniors</small></h1>
       <button class="cta" id="btnPlay" type="button">Play</button>
-      <p class="hint keys-only">Keyboard: arrows/WASD move · Space shoot · E pass · Q tackle or save · P pause</p>
+      <p class="hint keys-only">Keyboard: arrows/WASD move · Space shoot · E pass · Q tackle or save · P pause · M mute</p>
     </div>
   </section>
 
@@ -90,7 +90,7 @@
       <button class="cta small" id="btnResume" type="button">Resume</button>
       <button class="ghost" id="btnRestart" type="button">Restart match</button>
       <button class="ghost" id="btnQuit" type="button">Quit to menu</button>
-      <p class="hint keys-only">Arrows/WASD move · Space shoot (hold for power) · E pass (or call for it) · Q tackle, or save as keeper</p>
+      <p class="hint keys-only">Arrows/WASD move · Space shoot (hold for power) · E pass (or call for it) · Q tackle, or save as keeper · M mute</p>
     </div>
   </section>
 
@@ -111,6 +111,7 @@
 
   <!-- ====================================================== match chrome -->
   <div id="matchUi" hidden>
+    <button class="icon-btn" id="btnMute" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
     <button class="icon-btn" id="btnPause" type="button" aria-label="Pause">❚❚</button>
   </div>
 
@@ -130,6 +131,7 @@
   <script src="js/match.js"></script>
   <script src="js/render.js"></script>
   <script src="js/input.js"></script>
+  <script src="js/audio.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
 </body>

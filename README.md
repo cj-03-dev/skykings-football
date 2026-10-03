@@ -59,10 +59,22 @@ and reach further in goal.
 | Save (keeper)     | `Q` in your own box    | **Save**              |
 | Throw (ball boy)  | `Space` (hold = power) | **Throw**             |
 | Pause             | `P` or `Esc`           | ❚❚ button             |
+| Mute              | `M`                    | 🔊 button             |
 
 Shooting: hold the stick up or down while you shoot to aim for that side of the
 goal. The power bar's red zone is a gamble: a full-power blast from range
 can sail over the bar.
+
+## Sound
+
+- **FAAH:** every shot that misses the goal (wide, or over the bar, even off
+  the woodwork) plays the FAAH clip in `assets/faah.mp3`, and the crowd hushes
+  under it. A shot the keeper saves or a defender blocks isn't a miss.
+- **Match sounds:** referee's whistle (kick-off, ball out, goal, full time),
+  kicks and touches, tackles, posts ringing, the crowd's "ooooh" at saves,
+  and an air horn and roar for goals. A crowd bed follows the ball and gets
+  louder near the goals. All synthesised in the browser, no extra files.
+- Mute is remembered between visits.
 
 ## Files
 
@@ -75,8 +87,10 @@ can sail over the bar.
 | `js/match.js`   | Ball physics, rules, ball boy, and the AI.                       |
 | `js/render.js`  | The stadium, perspective pitch, players and HUD.                 |
 | `js/input.js`   | Keyboard and touch input.                                        |
+| `js/audio.js`   | FAAH playback and the synthesised match sounds.                  |
 | `js/ui.js`      | Menu flow: player, club, position, setup, full time.             |
 | `js/main.js`    | The game loop.                                                   |
+| `assets/faah.mp3` | The FAAH clip for missed shots.                                |
 | `assets/fonts`  | Russo One and Barlow Condensed (SIL Open Font License).          |
 
 `window.SK` exposes everything for poking at from the console. For example,

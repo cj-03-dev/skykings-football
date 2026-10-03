@@ -11,6 +11,22 @@
   const game = (SK.game = { mode: 'menu', match: null, demo: null, paused: false, cfg: null, touch: SK.ui.isTouch });
 
   SK.render.init($('pitch'));
+
+  // Sound needs a user gesture before it may start: the first tap or key does it.
+  game.unlockAudio = () => SK.audio.unlock();
+  const firstGesture = () => { game.unlockAudio(); window.removeEventListener('pointerdown', firstGesture); window.removeEventListener('keydown', firstGesture); };
+  window.addEventListener('pointerdown', firstGesture);
+  window.addEventListener('keydown', firstGesture);
+
+  function syncMute() {
+    const b = $('btnMute');
+    b.textContent = SK.audio.muted ? '🔇' : '🔊';
+    b.setAttribute('aria-pressed', String(SK.audio.muted));
+    b.setAttribute('aria-label', SK.audio.muted ? 'Unmute sound' : 'Mute sound');
+  }
+  game.toggleMute = () => { SK.audio.setMuted(!SK.audio.muted); syncMute(); };
+  $('btnMute').addEventListener('click', () => game.toggleMute());
+  syncMute();
   let resizeQueued = false;
   window.addEventListener('resize', () => {
     if (resizeQueued) return;
@@ -92,6 +108,7 @@
   };
 
   window.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyM') game.toggleMute();
     if (game.mode !== 'match') return;
     if (e.code === 'KeyP' || e.code === 'Escape') {
       if (game.match.phase === 'fulltime') return;
@@ -136,6 +153,7 @@
     } else acc = 0;
 
     SK.render.draw(m, { hud: inMatch, touch: game.touch });
+    SK.audio.frame(inMatch ? m : null);
     if (inMatch && m) SK.ui.frame(m);
     requestAnimationFrame(frame);
   }
